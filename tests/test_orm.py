@@ -1,4 +1,4 @@
-import model
+import models.model as model
 
 
 def test_orderline_mapper_can_load_lines(session):

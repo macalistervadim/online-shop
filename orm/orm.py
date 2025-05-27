@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, MetaData, String, Table
 from sqlalchemy.orm import mapper
 
-import model
+import models.model as model
 
 metadata = MetaData()
 
