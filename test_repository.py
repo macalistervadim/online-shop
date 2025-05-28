@@ -1,4 +1,4 @@
-import models.model as model
+import model
 import repository
 
 
