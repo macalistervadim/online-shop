@@ -1,4 +1,5 @@
 import pytest
+
 import model
 import repository
 import services
@@ -39,7 +40,10 @@ def test_error_for_invalid_sku():
     batch = model.Batch("b1", "AREALSKU", 100, eta=None)
     repo = FakeRepository([batch])
 
-    with pytest.raises(services.InvalidSku, match="Invalid sku NONEXISTENTSKU"):
+    with pytest.raises(
+        services.InvalidSku,
+        match="Invalid sku NONEXISTENTSKU",
+    ):
         services.allocate(line, repo, FakeSession())
 
 
@@ -55,20 +59,33 @@ def test_commits():
 
 def test_deallocate_decrements_available_quantity():
     repo, session = FakeRepository([]), FakeSession()
-    # TODO: you'll need to implement the services.add_batch method
     services.add_batch("b1", "BLUE-PLINTH", 100, None, repo, session)
     line = model.OrderLine("o1", "BLUE-PLINTH", 10)
     services.allocate(line, repo, session)
     batch = repo.get(reference="b1")
     assert batch.available_quantity == 90
-    # services.deallocate(...
-    ...
+    services.deallocate(line, repo, session)
     assert batch.available_quantity == 100
 
 
 def test_deallocate_decrements_correct_quantity():
-    ...  #  TODO - check that we decrement the right sku
+    repo, session = FakeRepository([]), FakeSession()
+    services.add_batch("b1", "BLUE-PLINTH", 100, None, repo, session)
+    services.add_batch("b2", "RED-PLINTH", 100, None, repo, session)
+    line = model.OrderLine("o1", "RED-PLINTH", 10)
+    services.allocate(line, repo, session)
+    batch_blue = repo.get(reference="b1")
+    batch_red = repo.get(reference="b2")
+    assert batch_blue.available_quantity == 100
+    assert batch_red.available_quantity == 90
+    services.deallocate(line, repo, session)
+    assert batch_blue.available_quantity == 100
+    assert batch_red.available_quantity == 100
 
 
 def test_trying_to_deallocate_unallocated_batch():
-    ...  #  TODO: should this error or pass silently? up to you.
+    repo, session = FakeRepository([]), FakeSession()
+    services.add_batch("b1", "BLUE-PLINTH", 100, None, repo, session)
+    line = model.OrderLine("o1", "BLUE-PLINTH", 10)
+    with pytest.raises(model.CannotDeallocate):
+        services.deallocate(line, repo, session)
