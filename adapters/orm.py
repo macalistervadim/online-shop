@@ -9,7 +9,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import registry, relationship
 
-import model
+import domain.model as model
 
 metadata = MetaData()
 
@@ -44,7 +44,8 @@ allocations = Table(
 def start_mappers():
     mapper_registry = registry()
     lines_mapper = mapper_registry.map_imperatively(
-        model.OrderLine, order_lines
+        model.OrderLine,
+        order_lines,
     )
     mapper_registry.map_imperatively(
         model.Batch,

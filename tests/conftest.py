@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import clear_mappers, sessionmaker
 
 import config
-from orm import metadata, start_mappers
+from adapters.orm import metadata, start_mappers
 
 
 @pytest.fixture
@@ -79,7 +79,7 @@ def add_stock(postgres_session):
             )
             [[batch_id]] = postgres_session.execute(
                 text(
-                    "SELECT id FROM batches WHERE reference=:ref AND sku=:sku"
+                    "SELECT id FROM batches WHERE reference=:ref AND sku=:sku",
                 ),
                 dict(ref=ref, sku=sku),
             )

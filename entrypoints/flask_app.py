@@ -2,12 +2,11 @@ from flask import Flask, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+import adapters.orm as orm
+import adapters.repository as repository
 import config
-import model
-import orm
-import repository
-import services
-
+import domain.model as model
+import service_layer.services as services
 
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))

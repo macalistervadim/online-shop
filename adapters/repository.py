@@ -1,5 +1,6 @@
 import abc
-import model
+
+import domain.model as model
 
 
 class AbstractRepository(abc.ABC):
@@ -20,7 +21,11 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session.add(batch)
 
     def get(self, reference):
-        return self.session.query(model.Batch).filter_by(reference=reference).one()
+        return (
+            self.session.query(model.Batch)
+            .filter_by(reference=reference)
+            .one()
+        )
 
     def list(self):
         return self.session.query(model.Batch).all()

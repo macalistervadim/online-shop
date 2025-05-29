@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import model
-from model import OrderLine
-from repository import AbstractRepository
-
-
-class InvalidSku(Exception):
-    pass
+import domain.model as model
+from adapters.repository import AbstractRepository
+from domain.model import OrderLine
+from service_layer.exceptions import InvalidSku
 
 
 def is_valid_sku(sku, batches):

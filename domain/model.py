@@ -3,9 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
-
-class OutOfStock(Exception):
-    pass
+from domain.exceptions import CannotDeallocate, OutOfStock
 
 
 def allocate(line: OrderLine, batches: list[Batch]) -> str:
@@ -15,10 +13,6 @@ def allocate(line: OrderLine, batches: list[Batch]) -> str:
         return batch.reference
     except StopIteration:
         raise OutOfStock(f"Out of stock for sku {line.sku}")
-
-
-class CannotDeallocate(Exception):
-    pass
 
 
 def deallocate(line: OrderLine, batches: list[Batch]) -> str:
