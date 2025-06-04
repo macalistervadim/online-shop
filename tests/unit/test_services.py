@@ -33,12 +33,18 @@ class FakeSession:
 
 
 def test_returns_allocation():
-    line = model.OrderLine("o1", "COMPLICATED-LAMP", 10)
-    batch = model.Batch("b1", "COMPLICATED-LAMP", 100, eta=None)
+    batch = model.Batch("batch1", "COMPLICATED-LAMP", 100, eta=None)
     repo = FakeRepository([batch])
 
-    result = services.allocate(line, repo, FakeSession())
-    assert result == "b1"
+    result = services.allocate(
+        "o1",
+        "COMPLICATED-LAMP",
+        10,
+        repo,
+        FakeSession(),
+    )
+
+    assert result == "batch1"
 
 
 def test_error_for_invalid_sku():
@@ -119,7 +125,10 @@ def test_prefers_current_stock_batches_to_shipments():
 
 def test_prefers_warehouse_batches_to_shipments():
     in_stock_batch = model.Batch(
-        "in-stock-batch", "RETRO-CLOCK", 100, eta=None
+        "in-stock-batch",
+        "RETRO-CLOCK",
+        100,
+        eta=None,
     )
     shipment_batch = model.Batch(
         "shipment-batch",
@@ -136,3 +145,10 @@ def test_prefers_warehouse_batches_to_shipments():
 
     assert in_stock_batch.available_quantity == 90
     assert shipment_batch.available_quantity == 100
+
+
+def test_add_batch():
+    repo, session = FakeRepository([]), FakeSession()
+    services.add_batch("b1", "CRUNCHY-ARMCHAIR", 100, None, repo, session)
+    assert repo.get("b1") is not None
+    assert session.committed
