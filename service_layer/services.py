@@ -26,7 +26,14 @@ def allocate(
     return batchref
 
 
-def deallocate(line: OrderLine, repo: AbstractRepository, session) -> None:
+def deallocate(
+    orderid: str,
+    sku: str,
+    qty: int,
+    repo: AbstractRepository,
+    session,
+) -> None:
+    line = OrderLine(orderid, sku, qty)
     batches = repo.list()
     if not is_valid_sku(line.sku, batches):
         raise InvalidSku(f"Invalid sku {line.sku}")
