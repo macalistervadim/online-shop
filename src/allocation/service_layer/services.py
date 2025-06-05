@@ -4,6 +4,7 @@ import domain.model as model
 from adapters.repository import AbstractRepository
 from domain.model import OrderLine
 
+from allocation.service_layer import unit_of_work
 from service_layer.exceptions import InvalidSku
 
 
@@ -15,15 +16,17 @@ def allocate(
     orderid: str,
     sku: str,
     qty: int,
-    repo: AbstractRepository,
-    session,
+    uow: unit_of_work.AbstractUnitOfWork,
 ) -> str:
     line = OrderLine(orderid, sku, qty)
-    batches = repo.list()
-    if not is_valid_sku(sku, batches):
-        raise InvalidSku(f"Invalid sku {sku}")
-    batchref = model.allocate(line, batches)
-    session.commit()
+
+    with uow:
+        batches = uow.batches.list()
+        if not is_valid_sku(line.sku, batches):
+            raise InvalidSku(f"Invalid sku {line.sku}")
+        batchref = model.allocate(line, batches)
+        uow.commit()
+
     return batchref
 
 
@@ -47,9 +50,8 @@ def add_batch(
     sku: str,
     qty: int,
     eta: str | None,
-    repo: AbstractRepository,
-    session,
+    uow: unit_of_work.AbstractUnitOfWork,
 ) -> None:
-    new_batch = model.Batch(ref, sku, qty, eta)
-    repo.add(new_batch)
-    session.commit()
+    with uow:
+        uow.batches.add(model.Batch(ref, sku, qty, eta))
+        uow.commit()
