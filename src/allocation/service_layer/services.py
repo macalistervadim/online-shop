@@ -3,6 +3,7 @@ from __future__ import annotations
 import domain.model as model
 from adapters.repository import AbstractRepository
 from domain.model import OrderLine
+
 from service_layer.exceptions import InvalidSku
 
 

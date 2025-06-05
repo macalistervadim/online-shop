@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 
 import pytest
-
 from domain.model import Batch, OrderLine, OutOfStock, allocate
 
 today = date.today()
@@ -35,10 +34,10 @@ def test_prefers_earlier_batches():
 
 def test_returns_allocated_batch_ref():
     in_stock_batch = Batch(
-        "in-stock-batch-ref", "HIGHBROW-POSTER", 100, eta=None
+        "in-stock-batch-ref", "HIGHBROW-POSTER", 100, eta=None,
     )
     shipment_batch = Batch(
-        "shipment-batch-ref", "HIGHBROW-POSTER", 100, eta=tomorrow
+        "shipment-batch-ref", "HIGHBROW-POSTER", 100, eta=tomorrow,
     )
     line = OrderLine("oref", "HIGHBROW-POSTER", 10)
     allocation = allocate(line, [in_stock_batch, shipment_batch])

@@ -1,0 +1,17 @@
+[tool.setuptools]
+packages = ["src"]
+
+[tool.ruff]
+exclude = [
+    "*/migrations/*",
+    "venv/",
+    "__init__.py",
+    "apps.py",
+]
+line-length = 79
+indent-width = 4
+[tool.ruff.lint]
+select = ["E", "W", "C", "F", "N", "COM", "I", "Q", "U", "N", "A", "M"]
+ignore = ["F405"]
+fixable = ["ALL"]
+unfixable = []

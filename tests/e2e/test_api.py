@@ -1,9 +1,8 @@
 import uuid
 
+import config
 import pytest
 import requests
-
-import config
 
 
 def random_suffix():

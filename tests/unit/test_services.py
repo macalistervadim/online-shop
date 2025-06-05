@@ -1,9 +1,8 @@
 from datetime import date, timedelta
 
-import pytest
-
 import adapters.repository as repository
 import domain.model as model
+import pytest
 import service_layer.services as services
 
 today = date.today()
