@@ -1,4 +1,3 @@
-import domain.model as model
 from sqlalchemy import (
     Column,
     Date,
@@ -9,6 +8,8 @@ from sqlalchemy import (
     Table,
 )
 from sqlalchemy.orm import registry, relationship
+
+import src.allocation.domain.model as model
 
 metadata = MetaData()
 

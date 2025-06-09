@@ -1,13 +1,14 @@
 from datetime import datetime
 
-import adapters.orm as orm
-import adapters.repository as repository
-import config
-import domain.model as model
-import service_layer.services as services
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+import src.allocation.adapters.orm as orm
+import src.allocation.config as config
+import src.allocation.domain.model as model
+import src.allocation.service_layer.services as services
+from allocation.service_layer import unit_of_work
 
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
@@ -16,27 +17,21 @@ app = Flask(__name__)
 
 @app.route("/allocate", methods=["POST"])
 def allocate_endpoint():
-    session = get_session()
-    repo = repository.SqlAlchemyRepository(session)
-
     try:
         batchref = services.allocate(
             request.json["orderid"],
             request.json["sku"],
             request.json["qty"],
-            repo,
-            session,
+            unit_of_work.SqlAlchemyUnitOfWork(),
         )
     except (model.OutOfStock, services.InvalidSku) as e:
-        return {"message": str(e)}, 400
+        return jsonify({"message": str(e)}), 400
 
-    return {"batchref": batchref}, 201
+    return jsonify({"batchref": batchref}), 201
 
 
 @app.route("/add_batch", methods=["POST"])
 def add_batch():
-    session = get_session()
-    repo = repository.SqlAlchemyRepository(session)
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -45,8 +40,6 @@ def add_batch():
         request.json["sku"],
         request.json["qty"],
         eta,
-        repo,
-        session,
+        unit_of_work.SqlAlchemyUnitOfWork(),
     )
-
-    return "0K", 201
+    return "OK", 201

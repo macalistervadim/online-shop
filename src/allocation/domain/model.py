@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
-from domain.exceptions import CannotDeallocate, OutOfStock
+from src.allocation.domain.exceptions import CannotDeallocate, OutOfStock
 
 
 def allocate(line: OrderLine, batches: list[Batch]) -> str:
