@@ -9,7 +9,7 @@ def insert_batch(session, ref, sku, qty, eta):
     session.execute(
         text(
             "INSERT INTO batches (reference, sku, _purchased_quantity, eta)"
-            " VALUES (:ref, :sku, :qty, :eta)"
+            " VALUES (:ref, :sku, :qty, :eta)",
         ),
         dict(ref=ref, sku=sku, qty=qty, eta=eta),
     )
@@ -37,7 +37,7 @@ def test_now_can_retrieve_a_batch_and_allocate_to_it(session_factory):
 
     uow = unit_of_work.SqlAlchemyUnitOfWork(session_factory)
     with uow:
-        batch = uow.batches.get(reference="batch1")
+        batch = uow.products.get(reference="batch1")
         line = model.OrderLine("o1", "HIPSTER-WORKBENCH", 10)
         batch.allocate(line)
         uow.commit()
