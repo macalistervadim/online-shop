@@ -61,31 +61,16 @@ markdown_extensions:
       emoji_generator: !!python/name:materialx.emoji.to_svg
 
 nav:
-  - Главная: index.md
   - Русский:
-    - Главная страница: ru/index.md
-    - API:
+      - Оглавление: ru/index.md
+      - Архитектура и паттерны: ru/archeticture/components.md
+      - Гайд по установке: ru/install.md
       - REST API: ru/api/rest.md
-    - Архитектура:
-      - Компоненты: ru/archeticture/components.md
-      - Безопасность: ru/archeticture/security.md
-    - Разработка:
-      - Установка: ru/development/setup.md
-      - Стандарты кода: ru/development/coding-standarts.md
-    - Операции:
-      - Логирование: ru/operations/logging.md
-      - Диагностика: ru/operations/troubleshooting.md
+      - FAQ: ru/faq.md
   - English:
-    - Homepage: en/index.md
-    - API:
+      - Table of Contents: en/index.md
+      - Architecture & Patterns: en/archeticture/components.md
+      - Installation & Launch Guide: en/install.md
       - REST API: en/api/rest.md
-    - Architecture:
-      - Components: en/archeticture/components.md
-      - Security: en/archeticture/security.md
-    - Development:
-      - Setup: en/development/setup.md
-      - Coding Standards: en/development/coding-standarts.md
-    - Operations:
-      - Logging: en/operations/logging.md
-      - Troubleshooting: en/operations/troubleshooting.md
-  - Лицензия: LICENCE.md
+      - FAQ: en/faq.md
+  - Лицензия: licence.md
