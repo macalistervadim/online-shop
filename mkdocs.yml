@@ -1,0 +1,91 @@
+site_name: e-commerce platform
+site_description: Documentation for e-commerce platform
+site_author: macalistervadim
+site_url: https://macalistervadim.github.io/online-shop/
+
+repo_url: https://github.com/macalistervadim/online-shop
+repo_name: macalistervadim/online-shop
+
+copyright: Copyright &copy; 2023 Macalister Vadim
+
+theme:
+  name: material
+  language: ru
+  
+  languages:
+    en: English
+    ru: Русский
+
+  palette:
+    - scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Тёмная тема
+    - scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Светлая тема
+
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.integrate
+    - content.tabs.link
+    - content.code.annotate
+    - lang.switch
+
+extra_css:
+  - css/extra.css
+
+extra_javascript:
+  - js/extra.js
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+nav:
+  - Главная: index.md
+  - Русский:
+    - Главная страница: ru/index.md
+    - API:
+      - REST API: ru/api/rest.md
+    - Архитектура:
+      - Компоненты: ru/archeticture/components.md
+      - Безопасность: ru/archeticture/security.md
+    - Разработка:
+      - Установка: ru/development/setup.md
+      - Стандарты кода: ru/development/coding-standarts.md
+    - Операции:
+      - Логирование: ru/operations/logging.md
+      - Диагностика: ru/operations/troubleshooting.md
+  - English:
+    - Homepage: en/index.md
+    - API:
+      - REST API: en/api/rest.md
+    - Architecture:
+      - Components: en/archeticture/components.md
+      - Security: en/archeticture/security.md
+    - Development:
+      - Setup: en/development/setup.md
+      - Coding Standards: en/development/coding-standarts.md
+    - Operations:
+      - Logging: en/operations/logging.md
+      - Troubleshooting: en/operations/troubleshooting.md
+  - Лицензия: LICENCE.md
