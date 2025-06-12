@@ -8,7 +8,7 @@ import src.allocation.adapters.orm as orm
 import src.allocation.config as config
 import src.allocation.domain.model as model
 import src.allocation.service_layer.services as services
-from allocation.service_layer import unit_of_work
+from src.allocation.service_layer import unit_of_work
 
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
@@ -43,3 +43,4 @@ def add_batch():
         unit_of_work.SqlAlchemyUnitOfWork(),
     )
     return "OK", 201
+

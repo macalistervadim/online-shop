@@ -1,5 +1,10 @@
+[project]
+name = "my_shop_project"
+version = "0.1.0"
+
 [tool.setuptools]
-packages = ["src"]
+packages = ["allocation"]
+include-package-data = true
 
 [tool.ruff]
 exclude = [
