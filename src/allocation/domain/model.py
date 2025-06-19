@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
+from src.allocation.domain import events
 from src.allocation.domain.exceptions import CannotDeallocate, OutOfStock
 
 
@@ -88,8 +89,9 @@ class Product:
         self.sku = sku
         self.batches = batches
         self.version_number = version_number
+        self.events: list[events.Event] = []
 
-    def allocate(self, line: OrderLine) -> str:
+    def allocate(self, line: OrderLine) -> str | None:
         try:
             batch = next(
                 b for b in sorted(self.batches) if b.can_allocate(line)
@@ -98,4 +100,5 @@ class Product:
             self.version_number += 1
             return batch.reference
         except StopIteration:
-            raise OutOfStock(f"Out of stock for sku {line.sku}")
+            self.events.append(events.OutOfStock(line.sku))
+            return None
