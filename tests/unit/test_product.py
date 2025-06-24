@@ -1,3 +1,4 @@
+from src.allocation.domain import events
 from src.allocation.domain.model import Batch, Product, OrderLine
 from tests.unit.test_allocate import today
 
