@@ -24,8 +24,8 @@ class AbstractUnitOfWork(abc.ABC):
         for product in self.products.seen:
             while product.events:
                 event = product.events.pop(0)
-                messagebus.handle(event)
-                yield product.events.pop(0)
+                messagebus.handle(event, self)
+                yield event
 
     @abc.abstractmethod
     def _commit(self):

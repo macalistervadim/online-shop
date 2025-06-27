@@ -4,10 +4,12 @@ from dataclasses import dataclass
 class Event:
     pass
 
+
 @dataclass
 class OutOfStock(Event):
     sku: str
-    
+
+
 @dataclass
 class BatchCreated(Event):
     ref: str
@@ -20,4 +22,10 @@ class BatchCreated(Event):
 class AllocationRequired(Event):
     orderid: str
     sku: str
+    qty: int
+    
+    
+@dataclass
+class BatchQuantityChanged(Event):
+    ref: str
     qty: int

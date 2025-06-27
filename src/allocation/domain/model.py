@@ -39,7 +39,7 @@ class Batch:
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = qty
-        self._allocations = set()  # type: set[OrderLine]
+        self._allocations: set[OrderLine] = set()
 
     def __repr__(self):
         return f"<Batch {self.reference}>"
@@ -66,6 +66,9 @@ class Batch:
     def deallocate(self, line: OrderLine):
         if line in self._allocations:
             self._allocations.remove(line)
+    
+    def deallocate_one(self):
+        return self._allocations.pop()
 
     @property
     def allocated_quantity(self) -> int:
@@ -102,3 +105,13 @@ class Product:
         except StopIteration:
             self.events.append(events.OutOfStock(line.sku))
             return None
+    
+    def change_batch_quantity(self, ref: str, qty: int):
+        batch = next(b for b in self.batches if b.reference == ref)
+        batch._purchased_quantity = qty
+        while batch.available_quantity < 0:
+            line = batch.deallocate_one()
+            self.events.append(
+                events.AllocationRequired(line.orderid, line.sku, line.qty)
+            )
+        

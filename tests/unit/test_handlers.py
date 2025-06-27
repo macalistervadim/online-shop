@@ -16,7 +16,10 @@ class FakeRepository(repository.AbstractRepository):
         self._products.add(product)
 
     def _get(self, sku):
-        return next((p for p in self._batches if p.sku == sku), None)
+        return next((p for p in self._products if p.sku == sku), None)
+    
+    def _get_by_batchref(self, batchref):
+        return next((p for p in self._products for b in p.batches if b.reference == batchref), None)
 
     def list(self):
         return list(self._products)
@@ -38,8 +41,28 @@ class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
 
     def rollback(self):
         pass
+    
 
-class AddBatch:
+class FakeUnitOfWorkWithFakeMessagebus(FakeUnitOfWork):
+    
+    def __init__(self):
+        super().__init__()
+        self.events_published: list[events.Event] = []
+    
+    def publish_events(self):
+        for product in self.products.seen:
+            while product.events: 
+                self.events_published.append(product.events.pop(0))
+                
+    def collect_new_events(self):
+        for product in self.products.seen:
+            while product.events:
+                event = product.events.pop(0)
+                self.events_published.append(event)
+                yield event
+
+
+class TestAddBatch:
     
     def test_for_new_product(self):
         uow = FakeUnitOfWork()
@@ -101,3 +124,68 @@ class TestAllocate:
                 events.AllocationRequired("o1", "NONEXISTENTSKU", 10),
                 uow=uow,
             )
+            
+
+class TestChangeBatchQuantity:
+    
+    def test_changes_available_quantity(self):
+        uow = FakeUnitOfWork()
+        messagebus.handle(
+            event=events.BatchCreated("batch1", "ADORABLE-SETTEE", 100, None),
+            uow=uow,
+        )
+        [batch] = uow.products.get(sku="ADORABLE-SETTEE").batches
+        assert batch.available_quantity == 100
+        
+        messagebus.handle(
+            event=events.BatchQuantityChanged("batch1", 50),
+            uow=uow,
+        )
+        [batch] = uow.products.get(sku="ADORABLE-SETTEE").batches
+        assert batch.available_quantity == 50
+    
+    def test_reallocates_if_necessary(self):
+        uow = FakeUnitOfWork()
+        event_history = [
+            events.BatchCreated("batch1", "ADORABLE-SETTEE", 50, None),
+            events.BatchCreated("batch2", "ADORABLE-SETTEE", 50, None),
+            events.AllocationRequired("o1", "ADORABLE-SETTEE", 20),
+            events.AllocationRequired("o2", "ADORABLE-SETTEE", 20),
+        ]
+        for event in event_history:
+            messagebus.handle(event, uow)
+        [batch1, batch2] = uow.products.get(sku="ADORABLE-SETTEE").batches
+        assert batch1.available_quantity == 10
+        assert batch2.available_quantity == 50
+        
+        messagebus.handle(
+            event=events.BatchQuantityChanged("batch1", 25),
+            uow=uow,
+        )
+        [batch1, batch2] = uow.products.get(sku="ADORABLE-SETTEE").batches
+        assert batch1.available_quantity == 5
+        assert batch2.available_quantity == 30
+    
+    def test_reallocates_if_necessary_isolated(self):
+        uow = FakeUnitOfWorkWithFakeMessagebus()
+        
+        event_history = [
+            events.BatchCreated("batch1", "ADORABLE-SETTEE", 50, None),
+            events.BatchCreated("batch2", "ADORABLE-SETTEE", 50, None),
+            events.AllocationRequired("o1", "ADORABLE-SETTEE", 20),
+            events.AllocationRequired("o2", "ADORABLE-SETTEE", 20),
+        ]
+        for event in event_history:
+            messagebus.handle(event, uow)
+        [batch1, batch2] = uow.products.get(sku="ADORABLE-SETTEE").batches
+        assert batch1.available_quantity == 10
+        assert batch2.available_quantity == 50
+        
+        messagebus.handle(
+            event=events.BatchQuantityChanged("batch1", 25),
+            uow=uow,
+        )
+        [reallocation_event] = uow.events_published
+        assert isinstance(reallocation_event, events.AllocationRequired)
+        assert reallocation_event.orderid in {"o1", "o2"}
+        assert reallocation_event.sku == "ADORABLE-SETTEE"
