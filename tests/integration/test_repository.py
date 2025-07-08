@@ -1,4 +1,5 @@
 import pytest
+
 from src.allocation.adapters import repository
 from src.allocation.domain import model
 

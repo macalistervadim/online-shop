@@ -16,7 +16,7 @@ class AbstractUnitOfWork(abc.ABC):
 
     def __exit__(self, *args):
         self.rollback()
-        
+
     def commit(self):
         self._commit()
 

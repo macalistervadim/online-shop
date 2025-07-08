@@ -1,6 +1,7 @@
 import pytest
-from tests.random_refs import random_batchref, random_orderid, random_sku
+
 from tests.e2e import api_client
+from tests.random_refs import random_batchref, random_orderid, random_sku
 
 
 @pytest.mark.usefixtures("postgres_db")
@@ -30,7 +31,10 @@ def test_happy_path_returns_202_and_batch_is_allocated():
 def test_unhappy_path_returns_400_and_error_message():
     unknown_sku, orderid = random_sku(), random_orderid()
     r = api_client.post_to_allocate(
-        orderid, unknown_sku, qty=20, expect_success=False
+        orderid,
+        unknown_sku,
+        qty=20,
+        expect_success=False,
     )
     assert r.status_code == 400
     assert r.json()["message"] == f"Invalid sku {unknown_sku}"

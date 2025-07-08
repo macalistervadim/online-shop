@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import src.allocation.domain.model as model
+from src.allocation.domain import events
 from src.allocation.domain.model import OrderLine
 from src.allocation.service_layer import unit_of_work
 from src.allocation.service_layer.exceptions import InvalidSku
-from src.allocation.domain import events
 
 
 def is_valid_sku(sku, batches):
@@ -26,7 +26,7 @@ def allocate(
         return batchref
 
 
-def deallocate( # fixme
+def deallocate(  # fixme
     orderid: str,
     sku: str,
     qty: int,
@@ -51,20 +51,24 @@ def add_batch(
         if product is None:
             product = model.Product(sku=event.sku, batches=[])
             uow.products.add(product)
-        product.batches.append(model.Batch(event.ref, event.sku, event.qty, event.eta))
+        product.batches.append(
+            model.Batch(event.ref, event.sku, event.qty, event.eta)
+        )
         uow.commit()
 
 
-def send_out_of_stock_notification(event: events.OutOfStock, uow: unit_of_work.AbstractUnitOfWork):
+def send_out_of_stock_notification(
+    event: events.OutOfStock, uow: unit_of_work.AbstractUnitOfWork
+):
     email.send_mail(
         "stock@made.com",
         f"Out of stock for {event.sku}",
     )
 
-    
+
 def change_batch_quantity(
-        event: events.BatchQuantityChanged,
-        uow: unit_of_work.AbstractUnitOfWork,
+    event: events.BatchQuantityChanged,
+    uow: unit_of_work.AbstractUnitOfWork,
 ) -> None:
     with uow:
         product = uow.products.get_by_batchref(batchref=event.ref)

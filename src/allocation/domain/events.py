@@ -16,15 +16,15 @@ class BatchCreated(Event):
     sku: str
     qty: int
     eta: str | None = None
-    
+
 
 @dataclass
 class AllocationRequired(Event):
     orderid: str
     sku: str
     qty: int
-    
-    
+
+
 @dataclass
 class BatchQuantityChanged(Event):
     ref: str
