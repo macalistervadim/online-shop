@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.12-slim
 
 # RUN apt install gcc libpq (no longer needed bc we use psycopg2-binary)
 

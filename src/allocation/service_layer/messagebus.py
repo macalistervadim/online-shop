@@ -33,7 +33,7 @@ def handle(message: Message, uow: "unit_of_work.AbstractUnitOfWork"):
 def handle_event(
     event: events.Event,
     queue: list[Message],
-    uow: unit_of_work.AbstractUnitOfWork,
+    uow: "unit_of_work.AbstractUnitOfWork",
 ):
     for handler in EVENT_HANDLERS[type(event)]:
         try:
@@ -60,7 +60,7 @@ def handle_event(
 def handle_command(
     command: commands.Command,
     queue: list[Message],
-    uow: unit_of_work.AbstractUnitOfWork,
+    uow: "unit_of_work.AbstractUnitOfWork",
 ):
     logger.debug("handling command %s", command)
     try:
