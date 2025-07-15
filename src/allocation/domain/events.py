@@ -29,3 +29,11 @@ class AllocationRequired(Event):
 class BatchQuantityChanged(Event):
     ref: str
     qty: int
+
+
+@dataclass
+class Allocated(Event):
+    orderid: str
+    sku: str
+    qty: int
+    batchref: str
