@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -50,10 +50,11 @@ def add_batch():
 
     return "OK", 201
 
+
 @app.route("/allocations/<orderid>", methods=["GET"])
 def allocations_view_endpoint(orderid):
     uow = unit_of_work.SqlAlchemyUnitOfWork()
     result = views.allocations(orderid, uow)
     if not result:
-        return "not found", 404 
+        return "not found"
     return jsonify(result), 200

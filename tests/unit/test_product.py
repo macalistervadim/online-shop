@@ -1,6 +1,6 @@
 from src.allocation.domain import events
 from src.allocation.domain.model import Batch, OrderLine, Product
-from tests.unit.test_allocate import today
+from tests.date import today
 
 
 def test_records_out_of_stock_event_if_cannot_allocate():

@@ -1,12 +1,7 @@
-from datetime import date, timedelta
-
 import pytest
 
 from src.allocation.domain.model import Batch, OrderLine, OutOfStock, allocate
-
-today = date.today()
-tomorrow = today + timedelta(days=1)
-later = tomorrow + timedelta(days=10)
+from tests.date import tomorrow, later, today
 
 
 def test_prefers_current_stock_batches_to_shipments():
