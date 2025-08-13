@@ -1,17 +1,19 @@
+# pylint: disable=attribute-defined-outside-init
+from __future__ import annotations
+
 import abc
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from src.allocation import config
 from src.allocation.adapters import repository
-from src.allocation.service_layer import messagebus
 
 
 class AbstractUnitOfWork(abc.ABC):
     products: repository.AbstractRepository
 
-    def __enter__(self) -> "AbstractUnitOfWork":
+    def __enter__(self) -> AbstractUnitOfWork:
         return self
 
     def __exit__(self, *args):
@@ -23,9 +25,7 @@ class AbstractUnitOfWork(abc.ABC):
     def collect_new_events(self):
         for product in self.products.seen:
             while product.events:
-                event = product.events.pop(0)
-                messagebus.handle(event, self)
-                yield event
+                yield product.events.pop(0)
 
     @abc.abstractmethod
     def _commit(self):
@@ -49,7 +49,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session_factory = session_factory
 
     def __enter__(self):
-        self.session: Session = self.session_factory()
+        self.session = self.session_factory()  # type: Session
         self.products = repository.SqlAlchemyRepository(self.session)
         return super().__enter__()
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from typing import Callable, Type
+
 import src.allocation.domain.model as model
 from src.allocation.adapters import redis_eventpublisher
-from src.allocation.domain import events
+from src.allocation.domain import commands, events
 from src.allocation.domain.model import OrderLine
 from src.allocation.service_layer import unit_of_work
 from src.allocation.service_layer.exceptions import InvalidSku
@@ -109,5 +111,18 @@ def remove_allocation_from_read_model(
     with uow:
         uow.session.execute(
             "DELETE FROM allocations_view "
-            " WHERE orderid = :orderid AND sku = :sku"
+            " WHERE orderid = :orderid AND sku = :sku",
         )
+
+
+EVENT_HANDLERS: dict[Type[events.Event], list[Callable]] = {
+    events.Allocated: [publish_allocated_event, add_allocation_to_read_model],
+    events.Deallocated: [remove_allocation_from_read_model],
+    events.OutOfStock: [send_out_of_stock_notification],
+}
+
+COMMAND_HANDLERS: dict[Type[commands.Command], Callable] = {
+    commands.Allocate: allocate,
+    commands.CreateBatch: add_batch,
+    commands.ChangeBatchQuantity: change_batch_quantity,
+}

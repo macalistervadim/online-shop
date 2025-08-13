@@ -4,15 +4,15 @@ from flask import Flask, jsonify, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import src.allocation.adapters.orm as orm
 import src.allocation.config as config
-from src.allocation.domain import events
+from src.allocation import bootstrap
+from src.allocation.domain import commands, events
 from src.allocation.service_layer import messagebus, unit_of_work
 from src.allocation.service_layer.exceptions import InvalidSku
 
-orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
 app = Flask(__name__)
+bus = bootstrap.bootstrap()
 
 
 @app.route("/allocate", methods=["POST"])
@@ -40,13 +40,13 @@ def add_batch():
     if eta is not None:
         datetime.fromisoformat(eta).date()
 
-    event = events.BatchCreated(
-        ref=request.json["ref"],
-        sku=request.json["sku"],
-        qty=request.json["qty"],
-        eta=eta,
+    cmd = commands.CreateBatch(
+        request.json("ref"),
+        request.json("sku"),
+        request.json("qty"),
+        eta,
     )
-    messagebus.handle(message=event, uow=unit_of_work.SqlAlchemyUnitOfWork())
+    bus.handle(cmd)
 
     return "OK", 201
 
